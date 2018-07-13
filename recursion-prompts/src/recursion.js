@@ -269,17 +269,41 @@ return increment + countOccurrence(array.slice(1), value);
 };
 
 // 21. Write a recursive version of map.
-rMap([1,2,3], timesTwo); // [2,4,6]
-var rMap = function(array, callback) {
+var rMap = (array, callback) => {
+  //return array with callback if array length is 1
+  if(array.length === 1) {
+  return callback(array);
+}
+  //return first index from array with callback while slicing array
+  return [callback(array[0])].concat(rMap(array.slice(1), callback));
+};
+// console.log(rMap([1,2,3], function(times){
+// return times * 2
+// }))
 
+// rMap([1,2,3], timesTwo); // [2,4,6]
+// function timesTwo(n) {
+//     return n * 2;
+// };
+// var rMap = function(array, callback) {
+//
+//
 //   var newArr = [];
 //   if (array.length === 0) [];
 //   if (newArr.length === array.length) [];
 //   return newArr.push(timesTwo(array.slice(1))) + rMap(array, callback);
 // };
-// function timesTwo(n){
-//     return n*2;
-// }
+
+// var rMap = function(array, callback) {
+//   var newArr = [];
+//   if (array.length === 0) {
+//     return [];
+//   }
+//   if (newArr.length === array.length) {
+//     return newArr.push(array[0]);
+//   }
+//   return newArr.push(array.slice(1));
+// };
 
 // var rMap = function(array, callback) {
 //
@@ -291,27 +315,86 @@ var rMap = function(array, callback) {
 //     return newArr.push(callback(array[0]));
 //   } else {
 //     newArr.push(callback(array[0]))
-//     return newArr.concat(rMap(array.slice(1),callback));
+//     return newArr.concat(rMap(array.slice(1), callback));
 //   }}
-};
+// };
 
 // 22. Write a function that counts the number of times a key occurs in an object.
 // var obj = {'e':{'x':'y'},'t':{'r':{'e':'r'},'p':{'y':'r'}},'y':'e'};
 // countKeysInObj(obj, 'r') // 1
 // countKeysInObj(obj, 'e') // 2
-var countKeysInObj = function(obj, key) {
+var countKeysInObj = function(obj, query) {
+      var count = 0;
+    for (var key in obj) {
+        var item = obj[key];
+        if (key === query) {
+            count++;
+        }
+        //key might be an object, so no else statement
+        if (typeof item === 'object') {
+            count += countKeysInObj(item, query);
+        }
+        //if neither case, nothing to do
+    }
+	return count;
+  // var keyCount = obj[0] === key ? 1 : 0;
+  // return keyCount += countKeysInObj(obj, key);
+  //return keyCount + countKeysInObj(obj, key);
+
+    //return var keyCount += 1 + countKeysInObj(obj, key);
+//     function countAllCharacters(str) {
+//   // your code here
+//   /* START SOLUTION */
+//   var rtn = {};
+//
+//   for(var i = 0; i < str.length; i++){
+//     //what's the point of testing for undefined?
+//     if(rtn[str[i]] === undefined){
+//       //set starting occurances to 0
+//       rtn[str[i]] = 0;
+//     }
+//     //then count the amount of times it appears thereafter, if at all.
+//     rtn[str[i]]++;
+//   }
+//   return rtn;
+//   /* END SOLUTION */
+// }
 };
 
 // 23. Write a function that counts the number of times a value occurs in an object.
 // var obj = {'e':{'x':'y'},'t':{'r':{'e':'r'},'p':{'y':'r'}},'y':'e'};
 // countValuesInObj(obj, 'r') // 2
 // countValuesInObj(obj, 'e') // 1
-var countValuesInObj = function(obj, value) {
+// var countValuesInObj = function(obj, value) {
+function countValuesInObj(object, query) {
+      var count = 0;
+      for (var key in object) {
+          var item = object[key];
+          if (item === query) {
+              count++;
+          }
+          if (typeof item === 'object') {
+            count += countValuesInObj(item, query);
+          }
+      }
+      return count;
 };
 
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, oldKey, newKey) {
+  for (var key in obj) {
+  var value = obj[key];
+  if (key === oldKey) {
+          obj[newKey] = value;
+          delete obj[oldKey];
+      }
+  if (typeof value === 'object') {
+    obj[key] = replaceKeysInObj(value, oldKey, newKey);
+  }
+}
+
+  return obj;
 };
 
 // 25. Get the first n Fibonacci numbers. In the Fibonacci sequence, each subsequent
@@ -320,7 +403,26 @@ var replaceKeysInObj = function(obj, oldKey, newKey) {
 // fibonacci(5); // [0,1,1,2,3,5]
 // Note: The 0 is not counted.
 var fibonacci = function(n) {
+  if (n <= 0) return null;
+  // if (n === 1) return [0,1,1];
+  if (n > 3) return [0,1,1];
+  else {
+      var addOn = [fibonacci(n-1)[fibonacci(n-1).length-1] + (fibonacci(n-1)[fibonacci(n-1).length-2])];
+      return fibonacci(n-1).concat(addOn);
+  }
+
+  // var nthFibo = function(n) {
+  //     if(n < 0) {
+  //     	return null;
+  //     } else if(n === 1) {
+  // 		return 1;
+  // 	}
+  //   	return nthFibo(n - 1) + nthFibo(n - 2);
+
 };
+//   if (n >= 0) {return null};
+//   return [n].concat(fibonacci(n - (n - )))
+// };
 
 // 26. Return the Fibonacci number located at index n of the Fibonacci sequence.
 // [0,1,1,2,3,5,8,13,21]
@@ -328,17 +430,38 @@ var fibonacci = function(n) {
 // nthFibo(7); // 13
 // nthFibo(3); // 2
 var nthFibo = function(n) {
+  if(n < 0) {
+  return null;
+} else if(n === 1) {
+return 1;
+}
+return nthFibo(n - 1) + nthFibo(n - 2);
 };
 
 // 27. Given an array of words, return a new array containing each word capitalized.
 // var words = ['i', 'am', 'learning', 'recursion'];
 // capitalizedWords(words); // ['I', 'AM', 'LEARNING', 'RECURSION']
 var capitalizeWords = function(array) {
+  // return array.map(function(elStr){return elStr[0].toUpperCase() + elStr.slice(1)});
+if(array.length===1) return array[0].toUpperCase();
+return newArray = [array[0].toUpperCase()].concat(capitalizeWords(array.slice(1)));
+//   var result = [];
+// if(input.length === 0) {
+//     return result;
+// }
+// result.push(input[0].toUpperCase());
+// result = result.concat(capitalizeWords(input.slice(1)));
+// return result;
 };
 
 // 28. Given an array of strings, capitalize the first letter of each index.
 // capitalizeFirst(['car','poop','banana']); // ['Car','Poop','Banana']
 var capitalizeFirst = function(array) {
+  let result = [];
+if(!array.length) { return result; }
+result.push(array[0].charAt(0).toUpperCase() + array[0].slice(1));
+result = result.concat(capitalizeFirst(array.slice(1)));
+return result;
 };
 
 // 29. Return the sum of all even numbers in an object containing nested objects.
@@ -356,11 +479,27 @@ var nestedEvenSum = function(obj) {
 // 30. Flatten an array containing nested arrays.
 // flatten([1,[2],[3,[[4]]],5]); // [1,2,3,4,5]
 var flatten = function(array) {
+  // return(String(array).split(',').map(Number));
+if(array.length===1 && !Array.isArray(array[0])) return array.shift();
+if(Array.isArray(array[0])) return flatten(array.shift().concat(array));
+return [array.shift()].concat(flatten(array));
 };
 
 // 31. Given a string, return an object containing tallies of each letter.
 // letterTally('potato'); // {p:1, o:2, t:2, a:1}
 var letterTally = function(str, obj) {
+  let result = Array.from(arguments)[1] || {};
+if(str.length === 0) {
+    return result;
+}
+if(!result[str[0]]) {
+    result[str[0]] = 1;
+} else
+ {
+    console.log(result[str[0]], 'hey');
+    result[str[0]]++;
+}
+return letterTally(str.slice(1), result);
 };
 
 // 32. Eliminate consecutive duplicates in a list. If the list contains repeated
@@ -369,18 +508,35 @@ var letterTally = function(str, obj) {
 // compress([1,2,2,3,4,4,5,5,5]) // [1,2,3,4,5]
 // compress([1,2,2,3,4,4,2,5,5,5,4,4]) // [1,2,3,4,2,5,4]
 var compress = function(list) {
+  if(list.length===1) return list.shift();
+if(list[0]===list[1]) return compress(list.slice(1));
+return [list.shift()].concat(compress(list));
 };
 
 // 33. Augument every element in a list with a new value where each element is an array
 // itself.
 // augmentElements([[],[3],[7]], 5); // [[5],[3,5],[7,5]]
 var augmentElements = function(array, aug) {
+  // return array.map(function(el){return el.concat(aug);});
+if(array.length===1) return array[0].concat(aug);
+return [array[0].concat(aug)].concat(augmentElements(array.slice(1), aug));
 };
 
 // 34. Reduce a series of zeroes to a single 0.
 // minimizeZeroes([2,0,0,0,1,4]) // [2,0,1,4]
 // minimizeZeroes([2,0,0,0,1,0,0,4]) // [2,0,1,0,4]
 var minimizeZeroes = function(array) {
+//   if (array.length === 0) { return array };
+// if(minimizeZeroes(array.slice(1))[0] === 0 && array[0] === 0) {
+//     return minimizeZeroes(array.slice(1));
+// } else {
+//     return [array[0]].concat(minimizeZeroes(array.slice(1)));
+// }
+
+if(array.length===1) return array.shift();
+if(array[0]===0 && array[1]===0) return minimizeZeroes(array.slice(1));
+return [array.shift()].concat(minimizeZeroes(array));
+
 };
 
 // 35. Alternate the numbers in an array between positive and negative regardless of
@@ -388,12 +544,33 @@ var minimizeZeroes = function(array) {
 // alternateSign([2,7,8,3,1,4]) // [2,-7,8,-3,1,-4]
 // alternateSign([-2,-7,8,3,-1,4]) // [2,-7,8,-3,1,-4]
 var alternateSign = function(array) {
+  if (array.length === 0) { return array; }
+if(array[0] < 0) { array[0] = -array[0]; }
+if(array[1] > 0) { array[1] = -array[1]; }
+return [array[0], array[1]].concat(alternateSign(array.slice(2)));
+
+// // return array.map(function(el, elInd){return (elInd%2) ? Math.abs(el)*(-1) : Math.abs(el);})
+// if(array.length===2) return (array[0]) ? Math.abs(array[1]) : Math.abs(array[1])*-1;
+// if(typeof array[0] !== 'boolean') array.unshift(true);
+// if(array[0]){
+//     array.splice(2,0,false);
+//     return [Math.abs(array[1])].concat(alternateSign(array.slice(2)));
+// }else{
+//     array.splice(2,0,true);
+//     return [Math.abs(array[1])*-1].concat(alternateSign(array.slice(2)));
+// }
+
 };
 
 // 36. Given a string, return a string with digits converted to their word equivalent.
 // Assume all numbers are single digits (less than 10).
 // numToText("I have 5 dogs and 6 ponies"); // "I have five dogs and six ponies"
 var numToText = function(str) {
+  var numNameRef = ['zero', 'one','two','three','four','five','six','seven','eight','nine'];
+var strArr = str.split(' ');
+if(strArr.length===1) return (!isNaN(Number(strArr[0]))) ? numNameRef[Number(strArr[0])] : strArr[0];
+var strRet = (strArr.slice(1).join(' '));
+return (!isNaN(Number(strArr[0]))) ? (numNameRef[Number(strArr[0])] + ' ' + numToText(strRet)) : (strArr[0] + ' ' + numToText(strRet));
 };
 
 
@@ -414,6 +591,14 @@ var binarySearch = function(array, target, min, max) {
 // mergeSort([34,7,23,32,5,62]) // [5,7,23,32,34,62]
 // https://www.khanacademy.org/computing/computer-science/algorithms/merge-sort/a/divide-and-conquer-algorithms
 var mergeSort = function(array) {
+  var leftArr=[];
+var rightArr=[];
+var arrayLengthHalf = array.length/2;
+var midPt = Math.floor(arrayLengthHalf);
+leftArr = array.slice(0,midPt);
+rightArr = array.slice(midpt+1);
+if(leftArr.length>1) return mergeSort(leftArr).concat(mergeSort(rightArr));
+return leftArr;
 };
 
 // 40. Deeply clone objects and arrays.
